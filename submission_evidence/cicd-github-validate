@@ -1,0 +1,103 @@
+GitHub Actions Workflow Run Validation Record
+================================================================================
+Repository: https://github.com/salonitiwari24/ci-cd-final-project
+Workflow: CI workflow (.github/workflows/workflow.yml)
+Run URL: https://github.com/salonitiwari24/ci-cd-final-project/actions/runs/39671407027
+Job URL: https://github.com/salonitiwari24/ci-cd-final-project/actions/runs/39671407027/job/119469951392
+Run ID: 39671407027
+Run Number: 2
+Event: push
+Head Branch: main
+Head SHA: 19850a606fed35d4be5a3db40dbf2a5cd4215dae
+Triggered By: salonitiwari24
+Status: completed
+Conclusion: success
+Runner: ubuntu-latest
+Container: python:3.9-slim
+
+================================================================================
+JOB: build (Status: completed, Conclusion: success)
+================================================================================
+
+Step 1: Set up job
+Result: success
+
+Step 2: Initialize containers
+Result: success
+Image: python:3.9-slim
+
+Step 3: Checkout
+Result: success
+Action: actions/checkout@v3
+
+Step 4: Install dependencies
+Result: success
+Command:
+  python -m pip install --upgrade pip
+  pip install -r requirements.txt
+Output:
+  Requirement already satisfied: pip in /usr/local/lib/python3.9/site-packages
+  Collecting Werkzeug==2.1.2
+  Collecting Flask==2.1.2
+  Collecting python-dotenv==0.20.0
+  Collecting gunicorn==20.1.0
+  Collecting honcho==1.1.0
+  Collecting pylint==2.14.0
+  Collecting flake8==4.0.1
+  Collecting black==22.3.0
+  Collecting nose==1.3.7
+  Collecting pinocchio==0.4.3
+  Collecting coverage==6.3.2
+  Collecting httpie==3.2.1
+  Successfully installed Werkzeug-2.1.2 Flask-2.1.2 black-22.3.0 coverage-6.3.2 flake8-4.0.1 gunicorn-20.1.0 honcho-1.1.0 httpie-3.2.1 nose-1.3.7 pinocchio-0.4.3 pylint-2.14.0 python-dotenv-0.20.0
+
+Step 5: Lint with flake8
+Result: success
+Commands:
+  flake8 service --count --select=E9,F63,F7,F82 --show-source --statistics
+  0
+  flake8 service --count --max-complexity=10 --max-line-length=127 --statistics
+  0
+Result: 0 errors, 0 warnings. All lint checks passed cleanly.
+
+Step 6: Run unit tests with nose
+Result: success
+Command:
+  nosetests -v --with-spec --spec-color --with-coverage --cover-package=app
+Output:
+  REST API Server Tests
+  - It should Create a counter
+  - It should not Create a duplicate counter
+  - It should Delete a counter
+  - It should be healthy
+  - It should call the index call
+  - It should List counters
+  - It should Read a counter
+  - It should Update a counter
+  - It should not Update a missing counter
+
+  Name                               Stmts   Miss  Cover   Missing
+  ----------------------------------------------------------------
+  service/__init__.py                   10      0   100%
+  service/common/error_handlers.py      35      0   100%
+  service/common/log_handlers.py        12      0   100%
+  service/common/status.py              44      0   100%
+  service/routes.py                     42      0   100%
+  ----------------------------------------------------------------
+  TOTAL                                143      0   100%
+  ----------------------------------------------------------------------
+  Ran 9 tests in 0.286s
+
+  OK
+
+Step 11: Post Checkout
+Result: success
+
+Step 12: Stop containers
+Result: success
+
+Step 13: Complete job
+Result: success
+================================================================================
+Workflow Execution Result: SUCCESS
+================================================================================
