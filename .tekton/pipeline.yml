@@ -1,0 +1,99 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: cd-pipeline
+spec:
+  workspaces:
+    - name: output
+      description: Shared workspace for pipeline steps
+  params:
+    - name: repo-url
+      type: string
+      description: The Git repository URL to clone
+      default: "https://github.com/salonitiwari24/ci-cd-final-project.git"
+    - name: branch
+      type: string
+      description: The Git branch to clone
+      default: "main"
+    - name: build-image
+      type: string
+      description: The container image to build and deploy
+      default: "image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/hit-counter:latest"
+    - name: app-name
+      type: string
+      description: The name of the application deployment
+      default: "hit-counter"
+  tasks:
+    - name: cleanup
+      taskRef:
+        name: cleanup
+      workspaces:
+        - name: source
+          workspace: output
+
+    - name: git-clone
+      taskRef:
+        name: git-clone
+      runAfter:
+        - cleanup
+      workspaces:
+        - name: output
+          workspace: output
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.branch)
+
+    - name: flake8
+      taskRef:
+        name: flake8
+      runAfter:
+        - git-clone
+      workspaces:
+        - name: source
+          workspace: output
+      params:
+        - name: image
+          value: "python:3.9-slim"
+        - name: args
+          value: ["service"]
+
+    - name: nose
+      taskRef:
+        name: nose
+      runAfter:
+        - flake8
+      workspaces:
+        - name: source
+          workspace: output
+      params:
+        - name: args
+          value: "-v"
+
+    - name: buildah
+      taskRef:
+        name: buildah
+      runAfter:
+        - nose
+      workspaces:
+        - name: source
+          workspace: output
+      params:
+        - name: IMAGE
+          value: $(params.build-image)
+
+    - name: deploy
+      taskRef:
+        name: openshift-client
+      runAfter:
+        - buildah
+      workspaces:
+        - name: source
+          workspace: output
+      params:
+        - name: SCRIPT
+          value: |
+            oc create deployment $(params.app-name) \
+              --image=$(params.build-image) \
+              --dry-run=client -o yaml | oc apply -f -
